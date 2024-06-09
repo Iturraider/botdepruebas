@@ -116,6 +116,9 @@ async def obtener_grupos(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 for i, grupo in enumerate(grupos_creados):
                     message += f"Grupo {i+1}: {', '.join(grupo)}\n"
                 await update.message.reply_text(message)
+                return ConversationHandler.END
+            else:
+                await update.message.reply_text("Por favor, ingresa un número válido.")
         except ValueError:
             await update.message.reply_text("Por favor, ingresa un número válido.")
             return 
