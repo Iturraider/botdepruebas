@@ -41,4 +41,9 @@ class TodoController:
     @staticmethod
     async def mensajes(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Esto es un mensaje de texto")
-        await update.message.reply_photo(photo="../el-libro-de-python.png")
+        await update.message.reply_photo(photo="https://ellibrodepython.com/assets/images/el-libro-de-python.png")
+        await update.message.reply_audio(audio="Grabación.m4a")
+        await update.message.reply_video(video="Grabación.m4a")
+        await update.message.reply_document(document="Características y necesidades sociales y emocionales del alumnado más capaz.pdf")
+        await update.message.reply_voice(voice="Grabación.m4a")
+        await update.message.reply_text("https://www.youtube.com/watch?v=9gnIvTUJIuY&list=PL1-d6o0SXOR4_b2alX7VDkvxmfSxvKygd&index=8")
