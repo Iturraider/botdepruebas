@@ -1,8 +1,11 @@
-from telegram import Update
-from telegram.ext import ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, ConversationHandler, filters, CallbackContext, CallbackQueryHandler
+import random
 
 from Models.Todo import Todo
-from Models.TodoList import todo_list
+from Models.TodoList import todo_list, crear_grupos
+
+OBTENER_GRUPOS, PRUEBA_OTRA_VEZ = range(2)
 
 class TodoController:
 
@@ -57,4 +60,78 @@ class TodoController:
         # await update.message.reply_chat_action("upload_voice")
         # await update.message.reply_chat_action("upload_video_note")
         # await update.message.reply_chat_action("upload_media")
+
+
+class GruposComunidad:
+
+    
+
+    @staticmethod
+    async def say_hello(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        
+        keyboard = ReplyKeyboardMarkup([
+        [KeyboardButton(text="2"), KeyboardButton(text="3")],
+        [KeyboardButton(text="4"), KeyboardButton(text="5")]
+    ])
+
+        await update.message.reply_text("Hola, bienvenido al bot para crear grupos de la comunidad")
+        await update.message.reply_text("¿Cuantos grupos quieres Hacer?", reply_markup=keyboard)
+        return OBTENER_GRUPOS
+
+    @staticmethod
+    async def boton_callback(update: Update, context: CallbackContext):
+        await update.callback_query.answer()
+        numero = update.callback_query.data
+        message = ""
+        lista = ["Jose y Laura", "Andrés y Salut", "Javi y Salut", "Luján y Sergio"," Enan y Pilar", "David y Sandra", "Marcos y Maria", "Ana María y Salva", "Joan", "Cristina", "Maria"]
+
+        mensaje = f"Vale, voy a hacer {numero} grupos de comunidad"
+        await update.callback_query.message.reply_text(mensaje)
+
+        grupos_creados = crear_grupos(int(numero), lista)
+                
+        for i, grupo in enumerate(grupos_creados):
+            message += f"Grupo {i+1}: {', '.join(grupo)}\n"
+        await update.callback_query.message.reply_text(message)
+        # await update.callback_query.message.reply_text(numero)
+
+    @staticmethod
+    async def cancel_conversation(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("Has dejado la conversación")
+        return ConversationHandler.END
+
+    @staticmethod
+    async def numero_grupos(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text("¿Cuantos grupos quieres hacer?")
+        return OBTENER_GRUPOS
+
+    @staticmethod
+    async def obtener_grupos(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        context.user_data["groups"] = update.message.text
+
+        try:
+            numero = int(context.user_data['groups'])
+        
+            mensaje = ""
+            message = ""
+            lista = ["Jose y Laura", "Andrés y Salut", "Javi y Salut", "Luján y Sergio"," Enan y Pilar", "David y Sandra", "Marcos y Maria", "Ana María y Salva", "Joan", "Cristina", "Maria"]
+            
+            if numero >= 0:
+                mensaje = f"Vale, voy a hacer {numero} grupos de comunidad"
+                await update.message.reply_text(mensaje)
+
+                grupos_creados = crear_grupos(numero, lista)
+                
+                for i, grupo in enumerate(grupos_creados):
+                    message += f"Grupo {i+1}: {', '.join(grupo)}\n"
+                await update.message.reply_text(message)
+                return ConversationHandler.END
+            else:
+                await update.message.reply_text("Por favor, ingresa un número válido.")
+        except ValueError:
+            await update.message.reply_text("Por favor, ingresa un número válido.")
+            return
+
+        # Suggested code may be subject to a license. Learn more: ~LicenseLog:910095168.
+        return ConversationHandler.END
 
